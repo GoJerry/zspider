@@ -79,7 +79,7 @@ def html_encoding(response_inst):
         html_text = response_inst.response.text[1:]  # 去除bom标记
         encodings = get_encodings_from_content(html_text)
         if encodings:
-            encoding = encoding[0]
+            encoding = encodings[0]
 
     if not encoding:
         encoding = get_encoding_from_headers(response_inst.response.headers)
