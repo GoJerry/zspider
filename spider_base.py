@@ -10,7 +10,7 @@
 __author__ = 'Zhang Fan'
 
 import os
-
+import signal
 import time
 import traceback
 import copy
@@ -55,10 +55,22 @@ class spider_base():
 
         self.downloader = httpreq(self.auto_cookie_enable)
 
+        self._raw_seed_dict = None
+        self._signal_init()
+
         self.log.info('spider_base初始化完成, 即将调用用户定义函数')
         self.spider_init()
 
         self.log.info(f'爬虫{self.spider_name}初始化完成')
+
+    def _signal_init(self):
+        for sig in [signal.SIGINT, signal.SIGTERM]:
+            signal.signal(sig, self._signal_handle)
+
+    def _signal_handle(self, *kw, **rs):
+        if self._raw_seed_dict:
+            self.seed_handler.put_error_seed(self._raw_seed_dict)
+        os._exit(0)
 
     def run_of_error_parser(self):
         self.seed_handler.queue_collname_list = [f'{self.spider_name}:{Public_Constant.error_seed_parser_suffix}']
