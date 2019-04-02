@@ -83,7 +83,10 @@ class Seed():
     def response_json(self):
         if self._response_json is None:
             try:
-                self._response_json = json.loads(self._response.text)
+                text = self._response.text
+                if text[0] == chr(65279):
+                    text = text[1:]
+                self._response_json = json.loads(text)
             except:
                 pass
         return self._response_json
